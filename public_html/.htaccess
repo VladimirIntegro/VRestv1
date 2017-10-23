@@ -1,0 +1,5 @@
+php_flag display_errors on
+#<IfModule mod_rewrite.c>
+#    RewriteEngine On
+#    RewriteRule ^ %{ENV:BASE}/index.php [L]
+#</IfModule>
