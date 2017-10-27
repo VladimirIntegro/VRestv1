@@ -39,18 +39,24 @@ class PricesData implements DataInterface {
     /**
      * Get averaged prices and difference between current and previous date prices for each town.
      * 
+     * @param int $dateFrom Date in timestamp format
+     * @param int $dateTo Date in timestamp format
      * @return array
      */
-    public function get() {
-        $dates = $this->currentAndPreviousDate();
+    public function getByDateInterval(string $dateFrom, string $dateTo) {
+        //$dates = $this->currentAndPreviousDate();
         //$curDatePrices = $this->dataStorage->getAveragedPricesByDate($dates["current"]);
         //$prevDatePrices = $this->dataStorage->getAveragedPricesByDate($dates["previous"]);
-        $curDatePrices = $this->dataStorage->getAveragedPricesByDate("2017-09-26");
-        $prevDatePrices = $this->dataStorage->getAveragedPricesByDate("2017-09-25");
-        if(!$curDatePrices || !$prevDatePrices) {
+        //$curDatePrices = $this->dataStorage->getAveragedPricesByDate("2017-09-26");
+        //$prevDatePrices = $this->dataStorage->getAveragedPricesByDate("2017-09-25");
+        //$dateFrom = date("Y-m-d", $dateFrom);
+        //$dateTo = date("Y-m-d", $dateTo);
+        //$prices = $this->dataStorage->getByDateInterval($dateFrom, $dateTo);
+        $prices = $this->dataStorage->getAveragedPricesForDates("2017-09-25", "2017-09-26");
+        if(!$prices) {
             throw new Exception("VRest: Error with getting prices");
         }
-        return $curDatePrices;
+        return $prices;
     }
     
 }

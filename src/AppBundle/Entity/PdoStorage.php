@@ -76,17 +76,18 @@ class PdoStorage implements DataStorageInterface {
     /**
      * Get averaged prices for towns by date
      * 
-     * @param string $date Date in string format "Y-m-d"
+     * @param string $dateFrom Date in string format "Y-m-d"
+     * @param string $dateTo Date in string format "Y-m-d"
      * @return array|null|FALSE Array of prices
      */
-    public function getAveragedPricesByDate(string $date) {
+    public function getAveragedPricesForDates(string $dateFrom, string $dateTo) {
         // prepare query statement
-        $stmt = $this->conn->prepare("SELECT price,town FROM price_stat WHERE date = :date AND type=20");
+        $stmt = $this->conn->prepare("SELECT price,town,date FROM price_stat WHERE date >= :datefr AND date <= :dateto AND type=20");
         //print_r($stmt); exit;
         //$date = "2017-09-26";
         // execute the query
         $prices = [];
-        if($stmt->execute([":date" => $date])) {
+        if($stmt->execute([":datefr" => $dateFrom, ":dateto" => $dateTo])) {
             //while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             //    $prices[] = $row;
             //}

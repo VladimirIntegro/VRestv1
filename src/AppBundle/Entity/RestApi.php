@@ -74,11 +74,31 @@ class RestApi implements RestApiInterface {
         //$query = $_SERVER["QUERY_STRING"];
         //$urlPathParams = explode('/', $urlPath);
         //$resource = array_shift($urlPathParams);
-        $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
-        $ret["code"] = 200;
-        $ret["body"] = json_encode($this->data->get());
-        //$ret["body"] = $query;
-        return $ret;
+        
+        // Check request method and call appropriate method
+        switch ($method) {
+            case "GET":
+                $query = $_SERVER["QUERY_STRING"];
+                $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
+                if(isset($_GET["datefr"]) && isset($_GET["dateto"])) {
+                    $dateFrom = intval($_GET["datefr"]);
+                    $dateTo = intval($_GET["dateto"]);
+                    $ret["headers"][] = self::RET_CODES["200"];
+                    $ret["body"] = json_encode($this->data->getByDateInterval($dateFrom, $dateTo));
+                }
+                else {
+                    $ret["headers"][] = self::RET_CODES["400"];
+                    $ret["body"] = "";
+                }
+                return $ret;
+            //case 'PUT':
+            //  $sql = "update `$table` set $set where id=$key"; break;
+            //case 'POST':
+            //  $sql = "insert into `$table` set $set"; break;
+            //case 'DELETE':
+            //  $sql = "delete `$table` where id=$key"; break;
+        }
+        
         /*// get the HTTP method, path and body of the request
         //$method = $_SERVER['REQUEST_METHOD'];
         $request = explode('/', trim($this->pathInfo,'/'));

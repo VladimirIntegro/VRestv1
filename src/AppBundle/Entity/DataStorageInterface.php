@@ -22,4 +22,13 @@ interface DataStorageInterface {
      */
     public function get();
     
+    /**
+     * Get averaged prices for towns by date
+     * 
+     * @param string $dateFrom Date in string format "Y-m-d"
+     * @param string $dateTo Date in string format "Y-m-d"
+     * @return array|null|FALSE Array of prices
+     */
+    public function getAveragedPricesForDates(string $dateFrom, string $dateTo);
+    
 }
