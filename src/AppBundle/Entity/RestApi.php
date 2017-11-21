@@ -67,8 +67,24 @@ class RestApi implements RestApiInterface {
      */
     public function process() {
         //$urlPath = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-        $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
-        $resourceType = preg_replace('/[^a-z0-9_]+/i','',array_shift($request));
+        //$request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
+        $request = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+        //$request = explode('/', $request);
+        //$request = array_shift($request);
+        $request = trim($request,'/');
+        $request = explode('/', $request);
+        $resource = array_shift($request);
+        $resource = preg_replace('/[^a-z0-9\-\.]+/i','', $resource);
+        
+        // Work only with prices. If not return 404.
+        if($resource != "prices") {
+            $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
+            $ret["headers"][] = self::RET_CODES["404"];
+            $ret["body"] = "";
+            return $ret;
+        }
+        
+        //$resourceType = preg_replace('/[^a-z0-9_]+/i','',array_shift($request));
         //$resourceKey = array_shift($request)+0;
         $method = $_SERVER["REQUEST_METHOD"];
         //$query = $_SERVER["QUERY_STRING"];
@@ -78,13 +94,15 @@ class RestApi implements RestApiInterface {
         // Check request method and call appropriate method
         switch ($method) {
             case "GET":
-                $query = $_SERVER["QUERY_STRING"];
+                //$query = $_SERVER["QUERY_STRING"];
+                //$query = parse_url($_SERVER["REQUEST_URI"], PHP_URL_QUERY);
                 $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
                 if(isset($_GET["datefr"]) && isset($_GET["dateto"])) {
                     $dateFrom = intval($_GET["datefr"]);
                     $dateTo = intval($_GET["dateto"]);
                     $ret["headers"][] = self::RET_CODES["200"];
                     $ret["body"] = json_encode($this->data->getByDateInterval($dateFrom, $dateTo));
+                    //$ret["body"] = "request=".print_r($request, true);
                 }
                 else {
                     $ret["headers"][] = self::RET_CODES["400"];
