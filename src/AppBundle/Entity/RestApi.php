@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use AppBundle\Entity\DataInterface;
+use AppBundle\Entity\AuthenticatorInterface;
 
 /**
  * Copyright 2017 Vladimir Zhitkov. All rights reserved.
@@ -47,17 +48,17 @@ class RestApi implements RestApiInterface {
     /**
      * Processes a request.
      * 
-     * @param string $aRequestMethod GET, POST, PUT, DELETE
-     * @param string $aPathInfo Server path info string
      * @param AppBundle\Entity\DataInterface $aData Data processing object
+     * @param AppBundle\Entity\AuthenticatorInterface $aAuthenticator Authentication checker
      * @return string 
      */
     //public function __construct(string $aRequestMethod, string $aPathInfo, DataInterface $aData) {
-    public function __construct(DataInterface $aData) {
+    public function __construct(DataInterface $aData, AuthenticatorInterface $aAuthenticator) {
         //$this->requestMethod = $aRequestMethod;
         //$this->pathInfo = $aPathInfo;
         //$this->requestBody = json_decode(file_get_contents('php://input'),true);
         $this->data = $aData;
+        $this->authenticator = $aAuthenticator;
     }
     
     /**
@@ -80,6 +81,16 @@ class RestApi implements RestApiInterface {
         if($resource != "prices") {
             $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
             $ret["headers"][] = self::RET_CODES["404"];
+            $ret["body"] = "";
+            return $ret;
+        }
+        
+        
+        // Authenticate referer
+        // TODO: replace the token with the real received
+        if(!$this->authenticator->validate(["3757DG4J7H2745DFU40HGOK4"])) {
+            $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
+            $ret["headers"][] = self::RET_CODES["403"];
             $ret["body"] = "";
             return $ret;
         }

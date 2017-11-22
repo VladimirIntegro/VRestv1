@@ -15,7 +15,7 @@ class Logger {
      * 
      * @param string $message Message to log
      */
-    public static function log($message) {
+    public function log($message) {
         error_log("LOGGER MESSAGE: $message");
     }
     

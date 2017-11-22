@@ -6,14 +6,14 @@ use AppBundle\Entity\PdoStorage;
 use AppBundle\Entity\PricesData;
 use AppBundle\Entity\RestApi;
 use AppBundle\Entity\Logger;
+use AppBundle\Entity\Authenticator;
 use AppBundle\Config\CoreConfig;
 
 // Autoload all classes
 require_once '..'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'autoload.php';
 
 try {
-    // TODO: Add checking for right IP address of referer and token.
-    // The functions should be placed in RestApi
+    $auth = new Authenticator(CoreConfig::ALLOWED_IPS, CoreConfig::API_SECRET_KEY);
     
     // DB config from included config.php
     $storage = new PdoStorage(CoreConfig::DB);
@@ -21,7 +21,7 @@ try {
 
     $data = new PricesData($storage);
 
-    $restApi = new RestApi($data);
+    $restApi = new RestApi($data, $auth);
     $result = $restApi->process();
     if($result) {
         foreach($result["headers"] as $curHeader) {
@@ -31,6 +31,7 @@ try {
     }
 
 } catch(Exception $e) {
-    Logger::log($e);
+    $logger = new Logger();
+    $logger->log($e);
     header('HTTP/1.1 500 Internal Server Error');
 }

@@ -20,4 +20,9 @@ class CoreConfig {
         'dbname'=>'podolska_ru2'
     ];
     
+    //const ALLOWED_IPS = ["164.132.148.103"];
+    const ALLOWED_IPS = ["127.0.0.1"];
+    
+    const API_SECRET_KEY = "3757DG4J7H2745DFU40HGOK4";
+    
 }
