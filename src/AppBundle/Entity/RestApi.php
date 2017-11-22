@@ -88,7 +88,7 @@ class RestApi implements RestApiInterface {
         
         // Authenticate referer
         // TODO: replace the token with the real received
-        if(!$this->authenticator->validate(["3757DG4J7H2745DFU40HGOK4"])) {
+        if(!$this->authenticator->validate(["ejfR2qcFWWSvk8eKybXC/w=="])) {
             $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
             $ret["headers"][] = self::RET_CODES["403"];
             $ret["body"] = "";

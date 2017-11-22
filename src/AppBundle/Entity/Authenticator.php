@@ -54,7 +54,8 @@ class Authenticator implements AuthenticatorInterface {
      * @return bool 
      */
     public function checkToken(string $receivedToken) {
-        return ($receivedToken == $this->apiSecretKey) ? true : false;
+        $secretKey = base64_encode(md5($this->apiSecretKey, true));
+        return ($receivedToken == $secretKey) ? true : false;
     }
     
     /**

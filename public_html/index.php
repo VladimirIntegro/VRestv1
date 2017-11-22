@@ -9,7 +9,7 @@ use AppBundle\Entity\Logger;
 use AppBundle\Entity\Authenticator;
 use AppBundle\Config\CoreConfig;
 
-// Autoload all classes
+// Autoload all files
 require_once '..'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'autoload.php';
 
 try {
