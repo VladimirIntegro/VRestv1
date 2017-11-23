@@ -85,13 +85,36 @@ class RestApi implements RestApiInterface {
             return $ret;
         }
         
+        // Get request body
+        $reqBody = json_decode(file_get_contents('php://input'), true);
+        //$reqBody = file_get_contents('php://input');
+        //$reqBody = preg_replace('/[^a-z0-9_]+/i', '', array_keys($reqBody));
+        /*$values = array_map(function ($value) use ($link) {
+          if ($value===null) return null;
+          return mysqli_real_escape_string($link,(string)$value);
+        }, array_values($input));*/
         
         // Authenticate referer
-        // TODO: replace the token with the real received
-        if(!$this->authenticator->validate(["ejfR2qcFWWSvk8eKybXC/w=="])) {
+        // TODO: Add method to return an error
+        //$token = $reqData["token"];
+        if(empty($reqBody)) {
             $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
             $ret["headers"][] = self::RET_CODES["403"];
-            $ret["body"] = "";
+            $ret["body"] = "Request body is empty!";
+            return $ret;
+        }
+        // Have no token
+        if(!isset($reqBody["token"])) {
+            $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
+            $ret["headers"][] = self::RET_CODES["403"];
+            $ret["body"] = "No token!";
+            return $ret;
+        }
+        
+        if(!$this->authenticator->validate([$reqBody["token"]])) {
+            $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
+            $ret["headers"][] = self::RET_CODES["403"];
+            $ret["body"] = "Bad token!";
             return $ret;
         }
         
@@ -107,25 +130,38 @@ class RestApi implements RestApiInterface {
             case "GET":
                 //$query = $_SERVER["QUERY_STRING"];
                 //$query = parse_url($_SERVER["REQUEST_URI"], PHP_URL_QUERY);
+                
                 $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
-                if(isset($_GET["datefr"]) && isset($_GET["dateto"])) {
-                    $dateFrom = intval($_GET["datefr"]);
-                    $dateTo = intval($_GET["dateto"]);
+                //if(isset($_GET["datefr"]) && isset($_GET["dateto"])) {
+                if(1) {
+                    //$dateFrom = intval($_GET["datefr"]);
+                    //$dateTo = intval($_GET["dateto"]);
                     $ret["headers"][] = self::RET_CODES["200"];
-                    $ret["body"] = json_encode($this->data->getByDateInterval($dateFrom, $dateTo));
-                    //$ret["body"] = "request=".print_r($request, true);
+                    //$ret["body"] = json_encode($this->data->getByDateInterval($dateFrom, $dateTo));
+                    $ret["body"] = "request=".print_r($reqBody, true)/*."\n columns=".print_r($columns, true)*/;
                 }
                 else {
                     $ret["headers"][] = self::RET_CODES["400"];
                     $ret["body"] = "";
                 }
                 return $ret;
-            //case 'PUT':
-            //  $sql = "update `$table` set $set where id=$key"; break;
-            //case 'POST':
-            //  $sql = "insert into `$table` set $set"; break;
-            //case 'DELETE':
-            //  $sql = "delete `$table` where id=$key"; break;
+            case 'PUT':
+                // $sql = "update `$table` set $set where id=$key";
+                // Get request data
+                $reqData = json_decode(file_get_contents('php://input'));
+                if(is_null($reqData)) {
+                    $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
+                    $ret["headers"][] = self::RET_CODES["400"];
+                    $ret["body"] = "";
+                    return $ret;
+                }
+                break;
+            case 'POST':
+                //  $sql = "insert into `$table` set $set";
+                break;
+            case 'DELETE':
+                //$sql = "delete `$table` where id=$key";
+                break;
         }
         
         /*// get the HTTP method, path and body of the request
