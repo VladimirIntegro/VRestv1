@@ -98,24 +98,16 @@ class RestApi implements RestApiInterface {
         // TODO: Add method to return an error
         //$token = $reqData["token"];
         if(empty($reqBody)) {
-            $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
-            $ret["headers"][] = self::RET_CODES["403"];
-            $ret["body"] = "Request body is empty!";
-            return $ret;
+            return $this->buildJsonRequestContent("403", "Request body is empty!");
         }
+        
         // Have no token
         if(!isset($reqBody["token"])) {
-            $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
-            $ret["headers"][] = self::RET_CODES["403"];
-            $ret["body"] = "No token!";
-            return $ret;
+            return $this->buildJsonRequestContent("403", "No token!");
         }
         
         if(!$this->authenticator->validate([$reqBody["token"]])) {
-            $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
-            $ret["headers"][] = self::RET_CODES["403"];
-            $ret["body"] = "Bad token!";
-            return $ret;
+            return $this->buildJsonRequestContent("403", "Bad token!");
         }
         
         //$resourceType = preg_replace('/[^a-z0-9_]+/i','',array_shift($request));
@@ -131,30 +123,19 @@ class RestApi implements RestApiInterface {
                 //$query = $_SERVER["QUERY_STRING"];
                 //$query = parse_url($_SERVER["REQUEST_URI"], PHP_URL_QUERY);
                 
-                $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
-                //if(isset($_GET["datefr"]) && isset($_GET["dateto"])) {
-                if(1) {
-                    //$dateFrom = intval($_GET["datefr"]);
-                    //$dateTo = intval($_GET["dateto"]);
-                    $ret["headers"][] = self::RET_CODES["200"];
-                    //$ret["body"] = json_encode($this->data->getByDateInterval($dateFrom, $dateTo));
-                    $ret["body"] = "request=".print_r($reqBody, true)/*."\n columns=".print_r($columns, true)*/;
+                if(isset($reqBody["datefr"]) && isset($reqBody["dateto"])) {
+                //if(1) {
+                    $dateFrom = intval($reqBody["datefr"]);
+                    $dateTo = intval($reqBody["dateto"]);
+                    //$ret["body"] = "request=".print_r($reqBody, true)/*."\n columns=".print_r($columns, true)*/;
+                    return $this->buildJsonRequestContent("200", 
+                            json_encode($this->data->getByDateInterval($dateFrom, $dateTo)));
                 }
                 else {
-                    $ret["headers"][] = self::RET_CODES["400"];
-                    $ret["body"] = "";
+                    return $this->buildJsonRequestContent("400", "No date interval!");
                 }
-                return $ret;
             case 'PUT':
                 // $sql = "update `$table` set $set where id=$key";
-                // Get request data
-                $reqData = json_decode(file_get_contents('php://input'));
-                if(is_null($reqData)) {
-                    $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
-                    $ret["headers"][] = self::RET_CODES["400"];
-                    $ret["body"] = "";
-                    return $ret;
-                }
                 break;
             case 'POST':
                 //  $sql = "insert into `$table` set $set";
@@ -238,6 +219,18 @@ class RestApi implements RestApiInterface {
 
         // close mysql connection
         //mysqli_close($link);*/
+    }
+    
+    /*
+     * Form JSON request content with code and body.
+     * 
+     * @param 
+     */
+    private function buildJsonRequestContent(int $code, $body) {
+        $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
+        $ret["headers"][] = self::RET_CODES[$code];
+        $ret["body"] = $body;
+        return $ret;
     }
     
 }
