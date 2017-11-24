@@ -1,7 +1,6 @@
 <?php
 // Input file
 namespace AppBundle;
-phpinfo();exit;
 
 use AppBundle\Entity\PdoStorage;
 use AppBundle\Entity\PricesData;
