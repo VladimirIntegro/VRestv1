@@ -129,7 +129,7 @@ class RestApi implements RestApiInterface {
                     $dateTo = intval($reqBody["dateto"]);
                     //$ret["body"] = "request=".print_r($reqBody, true)/*."\n columns=".print_r($columns, true)*/;
                     return $this->buildJsonRequestContent("200", 
-                            json_encode($this->data->getByDateInterval($dateFrom, $dateTo)));
+                            json_encode($this->data->getPricesByDateInterval($dateFrom, $dateTo)));
                 }
                 else {
                     return $this->buildJsonRequestContent("400", "No date interval!");

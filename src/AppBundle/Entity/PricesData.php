@@ -43,7 +43,7 @@ class PricesData implements DataInterface {
      * @param int $dateTo Date in timestamp format
      * @return array
      */
-    public function getByDateInterval(string $dateFrom, string $dateTo) {
+    public function getPricesByDateInterval(string $dateFrom, string $dateTo) {
         //$dates = $this->currentAndPreviousDate();
         //$curDatePrices = $this->dataStorage->getAveragedPricesByDate($dates["current"]);
         //$prevDatePrices = $this->dataStorage->getAveragedPricesByDate($dates["previous"]);
