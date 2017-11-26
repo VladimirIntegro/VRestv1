@@ -1,4 +1,5 @@
-AddType application/x-httpd-php70 .php
+#AddType application/x-httpd-php70 .php
+AddDefaultCharset utf-8
 
 php_flag display_errors on
 
