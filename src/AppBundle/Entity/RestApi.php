@@ -87,11 +87,7 @@ class RestApi implements RestApiInterface {
             return $this->buildJsonRequestContent("404", "Bad resource!");
         }
         
-        // Check user name and password. Return access denied if they're wrong.
-        //if(empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
-        //    return $this->buildJsonRequestContent("403", "No user, password!");
-        //}
-        //if(!$this->authenticator->validate([$_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']])) {
+        // Validate the referrer
         if(!$this->authenticator->validate()) {
             return $this->buildJsonRequestContent("403", "Bad credentials!");
         }
