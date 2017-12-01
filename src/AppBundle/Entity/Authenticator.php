@@ -10,67 +10,36 @@ use AppBundle\Entity\AuthenticatorInterface;
  * 
  * Authenticator of the API referer.
  */
-class Authenticator implements AuthenticatorInterface {
+abstract class Authenticator implements AuthenticatorInterface {
     
     /**
-     * @var array $allowedIPs Referer allowed IP addresses
+     * @var array $authParams All checking authentication parameters
      */
-    private $allowedIPs;
+    private $authParams;
     
     /**
-     * @var string $apiSecretKey The API secret key to check
+     * @param array $authParams Authentication parameters to check
      */
-    private $apiSecretKey;
-    
-    /**
-     * @param array $allowedIPs Referer allowed IP addresses
-     * @param string $apiSecretKey The API secret key to check
-     */
-    public function __construct(array $allowedIPs, string $apiSecretKey)
+    public function __construct(array $authParams)
     {
-        $this->allowedIPs = $allowedIPs;
-        $this->apiSecretKey = $apiSecretKey;
+        $this->authParams = $authParams;
     }
     
     /**
-     * Check IP address
+     * Gets $authParams
      * 
-     * @return bool 
+     * @return array $authParams Authentication parameters
      */
-    public function checkIP() {
-        if( isset($_SERVER['REMOTE_ADDR']) && 
-            in_array($_SERVER['REMOTE_ADDR'], $this->allowedIPs, true) ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+    public function getAuthParams()
+    {
+        return $this->authParams;
     }
     
     /**
-     * Check token
+     * Validate referrer
      * 
-     * @param string $receivedToken Token to check
-     * @return bool 
+     * @return bool True if the authentication parameters is valid
      */
-    public function checkToken(string $receivedToken) {
-        $secretKey = base64_encode(md5($this->apiSecretKey, true));
-        return ($receivedToken == $secretKey) ? true : false;
-    }
-    
-    /**
-     * Validate referer
-     * 
-     * @param array $authParams All parameters list
-     * @return bool 
-     */
-    public function validate(array $authParams) {
-        if( $this->checkIP() && $this->checkToken($authParams[0]) ) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+    abstract public function validate();
     
 }

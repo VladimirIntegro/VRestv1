@@ -29,9 +29,14 @@ class RestApi implements RestApiInterface {
     //private $requestBody;
     
     /**
-     * @var BaseData Data processing object
+     * @var DataInterface Data processing object
      */
     private $data;
+    
+    /**
+     * @var AuthenticatorInterface The API authentication object
+     */
+    private $authenticator;
     
     const RET_CODES = [
             "200" => "HTTP/1.1 200 OK",
@@ -72,43 +77,50 @@ class RestApi implements RestApiInterface {
         $request = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
         //$request = explode('/', $request);
         //$request = array_shift($request);
-        $request = trim($request,'/');
-        $request = explode('/', $request);
+        //return $this->buildJsonRequestContent("200", print_r($quer, true));
+        $request = explode('/', trim($request,'/'));
         $resource = array_shift($request);
         $resource = preg_replace('/[^a-z0-9\-\.]+/i','', $resource);
         
         // Work only with prices. If not return 404.
         if($resource != "prices") {
-            $ret["headers"][] = "Content-type: application/json; charset=UTF-8";
-            $ret["headers"][] = self::RET_CODES["404"];
-            $ret["body"] = "";
-            return $ret;
+            return $this->buildJsonRequestContent("404", "Bad resource!");
         }
         
+        // Check user name and password. Return access denied if they're wrong.
+        //if(empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
+        //    return $this->buildJsonRequestContent("403", "No user, password!");
+        //}
+        //if(!$this->authenticator->validate([$_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']])) {
+        if(!$this->authenticator->validate()) {
+            return $this->buildJsonRequestContent("403", "Bad credentials!");
+        }
+        //return $this->buildJsonRequestContent("200", $_SERVER['PHP_AUTH_USER'].":".$_SERVER['PHP_AUTH_PW']);
+        
         // Get request body
-        $reqBody = json_decode(file_get_contents('php://input'), true);
-        //$reqBody = file_get_contents('php://input');
+        //$reqBody = json_decode(file_get_contents('php://input'), true);
+        $reqBody = file_get_contents('php://input');
+        //return $this->buildJsonRequestContent("200", print_r($reqBody, true));
+        
         //$reqBody = preg_replace('/[^a-z0-9_]+/i', '', array_keys($reqBody));
         /*$values = array_map(function ($value) use ($link) {
           if ($value===null) return null;
           return mysqli_real_escape_string($link,(string)$value);
         }, array_values($input));*/
         
-        // Authenticate referer
-        // TODO: Add method to return an error
-        //$token = $reqData["token"];
+        /*// Check request body
         if(empty($reqBody)) {
             return $this->buildJsonRequestContent("403", "Request body is empty!");
-        }
+        }*/
         
-        // Have no token
-        if(!isset($reqBody["token"])) {
-            return $this->buildJsonRequestContent("403", "No token!");
-        }
-        
-        if(!$this->authenticator->validate([$reqBody["token"]])) {
-            return $this->buildJsonRequestContent("403", "Bad token!");
-        }
+        //// Have no token
+        //if(!isset($reqBody["token"])) {
+        //    return $this->buildJsonRequestContent("403", "No token!");
+        //}
+        //
+        //if(!$this->authenticator->validate([$reqBody["token"]])) {
+        //    return $this->buildJsonRequestContent("403", "Bad token!");
+        //}
         
         //$resourceType = preg_replace('/[^a-z0-9_]+/i','',array_shift($request));
         //$resourceKey = array_shift($request)+0;
@@ -121,12 +133,27 @@ class RestApi implements RestApiInterface {
         switch ($method) {
             case "GET":
                 //$query = $_SERVER["QUERY_STRING"];
-                //$query = parse_url($_SERVER["REQUEST_URI"], PHP_URL_QUERY);
+                $quer = parse_url($_SERVER["REQUEST_URI"], PHP_URL_QUERY);
+                if(!$quer) {
+                    return $this->buildJsonRequestContent("400", "Request query is empty!");
+                }
+                //return $this->buildJsonRequestContent("200", print_r($quer, true));
+                $querParams = array_filter(explode('&', $quer));
+                if(empty($querParams)) {
+                    return $this->buildJsonRequestContent("400", "Bad request query!");
+                }
+                foreach($querParams as $par) {
+                    $parCur = array_filter(explode('=', $par));
+                    if(empty($parCur)) {
+                        return $this->buildJsonRequestContent("400", "Bad request query!");
+                    }
+                    $querParamsAssoc[$parCur[0]] = $parCur[1];
+                }
                 
-                if(isset($reqBody["datefr"]) && isset($reqBody["dateto"])) {
-                //if(1) {
-                    $dateFrom = intval($reqBody["datefr"]);
-                    $dateTo = intval($reqBody["dateto"]);
+                //if(isset($reqBody["datefr"]) && isset($reqBody["dateto"])) {
+                if(isset($querParamsAssoc["datefr"]) && isset($querParamsAssoc["dateto"])) {
+                    $dateFrom = intval($querParamsAssoc["datefr"]);
+                    $dateTo = intval($querParamsAssoc["dateto"]);
                     //$ret["body"] = "request=".print_r($reqBody, true)/*."\n columns=".print_r($columns, true)*/;
                     return $this->buildJsonRequestContent("200", 
                             json_encode($this->data->getPricesByDateInterval($dateFrom, $dateTo)));

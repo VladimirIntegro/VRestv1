@@ -11,26 +11,22 @@ namespace AppBundle\Entity;
 interface AuthenticatorInterface {
     
     /**
-     * Check IP address
-     * 
-     * @return bool 
+     * @param array $authParams Authentication parameters to check
      */
-    public function checkIP();
+    public function __construct(array $authParams);
     
     /**
-     * Check token
+     * Gets $authParams
      * 
-     * @param string $receivedToken Token to check
-     * @return bool 
+     * @return array $authParams Authentication parameters
      */
-    public function checkToken(string $receivedToken);
+    public function getAuthParams();
     
     /**
-     * Validate referer
+     * Validate referrer authentication parameters that was passed to the constructor
      * 
-     * @param array $authParams All parameters list
      * @return bool 
      */
-    public function validate(array $authParams);
+    public function validate();
     
 }

@@ -6,14 +6,14 @@ use AppBundle\Entity\PdoStorage;
 use AppBundle\Entity\PricesData;
 use AppBundle\Entity\RestApi;
 use AppBundle\Entity\Logger;
-use AppBundle\Entity\Authenticator;
+use AppBundle\Entity\AuthenticatorBasic;
 use AppBundle\Config\CoreConfig;
 
 // Autoload all files
 require_once '..'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'autoload.php';
 
 try {
-    $auth = new Authenticator(CoreConfig::ALLOWED_IPS, CoreConfig::API_SECRET_KEY);
+    $auth = new AuthenticatorBasic(CoreConfig::AUTH_PARAMS);
     
     // DB config from included config.php
     $storage = new PdoStorage(CoreConfig::DB);
