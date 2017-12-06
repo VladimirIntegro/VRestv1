@@ -150,9 +150,34 @@ class RestApi implements RestApiInterface {
                 if(isset($querParamsAssoc["datefr"]) && isset($querParamsAssoc["dateto"])) {
                     $dateFrom = intval($querParamsAssoc["datefr"]);
                     $dateTo = intval($querParamsAssoc["dateto"]);
-                    //$ret["body"] = "request=".print_r($reqBody, true)/*."\n columns=".print_r($columns, true)*/;
-                    return $this->buildJsonRequestContent("200", 
-                            json_encode($this->data->getPricesByDateInterval($dateFrom, $dateTo)));
+                    // Get prices for types
+                    if(isset($querParamsAssoc["types"])) {
+                        $types = explode(",", rawurldecode($querParamsAssoc["types"]));
+                        $cleanTypes = array_map(
+                                function ($t) {
+                                    return intval($t);
+                                },
+                                $types
+                            );
+                        return $this->buildJsonRequestContent(
+                            "200", 
+                            json_encode(
+                                    $this->data->getAllPrices($dateFrom, $dateTo, $cleanTypes), 
+                                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK
+                                )
+                        );
+                    }
+                    else {
+                        // Get averaged prices only
+                        //$ret["body"] = "request=".print_r($reqBody, true)/*."\n columns=".print_r($columns, true)*/;
+                        return $this->buildJsonRequestContent(
+                                "200", 
+                                json_encode(
+                                        $this->data->getAveragedPricesByDateInterval($dateFrom, $dateTo), 
+                                        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK
+                                    )
+                            );
+                    }
                 }
                 else {
                     return $this->buildJsonRequestContent("400", "No date interval!");

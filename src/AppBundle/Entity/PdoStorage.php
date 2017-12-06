@@ -74,15 +74,61 @@ class PdoStorage implements DataStorageInterface {
     }
     
     /**
+     * {@inheritdoc}
+     */
+    public function getPrices(string $dateFrom = null, string $dateTo = null, array $types = null, array $towns = null) {
+        // prepare query statement
+        $queryStr = "SELECT price,town,date,type FROM price_stat";
+        $executeParams = [];
+        if($dateFrom || $dateTo || $types || $towns) {
+            $queryStr .= " WHERE";
+            if($dateFrom) {
+                $queryStr .= " date >= :datefr";
+                $executeParams[":datefr"] = $dateFrom;
+            }
+            if($dateTo) {
+                $queryStr .= " AND date <= :dateto";
+                $executeParams[":dateto"] = $dateTo;
+            }
+            if($types) {
+                $queryStr .= " AND type IN (:types)";
+                $executeParams[":types"] = implode(",", $types);
+            }
+            if($towns) {
+                $queryStr .= " AND town IN (:towns)";
+                $executeParams[":towns"] = implode(",", $towns);
+            }
+        }
+        $stmt = $this->conn->prepare($queryStr);
+        //return $executeParams;
+        // execute the query
+        $prices = [];
+        $execRet = false;
+        if(empty($executeParams)) {
+            $execRet = $stmt->execute();
+        }
+        else {
+            $execRet = $stmt->execute($executeParams);
+        }
+        if($execRet) {
+            //while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            //    $prices[] = $row;
+            //}
+            $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+        return (empty($prices)) ? false : $prices;
+    }
+    
+    /**
      * Get averaged prices for towns by date
      * 
      * @param string $dateFrom Date in string format "Y-m-d"
      * @param string $dateTo Date in string format "Y-m-d"
      * @return array|null|FALSE Array of prices
      */
-    public function getAveragedPricesForDates(string $dateFrom, string $dateTo) {
+    /*public function getAveragedPricesForDates(string $dateFrom, string $dateTo) {
         // prepare query statement
-        $stmt = $this->conn->prepare("SELECT price,town,date FROM price_stat WHERE date >= :datefr AND date <= :dateto AND type=20");
+        $stmt = $this->conn->prepare("SELECT price,town,date,type FROM price_stat WHERE date >= :datefr AND date <= :dateto AND type=20");
         //print_r($stmt); exit;
         //$date = "2017-09-26";
         // execute the query
@@ -94,6 +140,6 @@ class PdoStorage implements DataStorageInterface {
             $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         return (empty($prices)) ? false : $prices;
-    }
+    }*/
     
 }
