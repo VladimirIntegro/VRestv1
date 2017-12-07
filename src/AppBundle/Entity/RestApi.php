@@ -152,6 +152,9 @@ class RestApi implements RestApiInterface {
                     $dateTo = intval($querParamsAssoc["dateto"]);
                     // Get prices for types
                     if(isset($querParamsAssoc["types"])) {
+                        //$ret[] = $querParamsAssoc["types"];
+                        //$ret[] = rawurldecode($querParamsAssoc["types"]);
+                        //$ret[] = explode(",", rawurldecode($querParamsAssoc["types"]));
                         $types = explode(",", rawurldecode($querParamsAssoc["types"]));
                         $cleanTypes = array_map(
                                 function ($t) {
@@ -159,6 +162,10 @@ class RestApi implements RestApiInterface {
                                 },
                                 $types
                             );
+                        //$ret[] = $cleanTypes;
+                        //return $this->buildJsonRequestContent("200", json_encode(print_r($ret, true), 
+                        //            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK
+                        //        ));
                         return $this->buildJsonRequestContent(
                             "200", 
                             json_encode(
@@ -186,7 +193,7 @@ class RestApi implements RestApiInterface {
                 // $sql = "update `$table` set $set where id=$key";
                 break;
             case 'POST':
-                //  $sql = "insert into `$table` set $set";
+                // $sql = "insert into `$table` set $set";
                 break;
             case 'DELETE':
                 //$sql = "delete `$table` where id=$key";

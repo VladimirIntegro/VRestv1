@@ -56,6 +56,7 @@ class PricesData implements DataInterface {
         
         //$prices = $this->dataStorage->getByDateInterval($dateFrom, $dateTo);
         //$prices = $this->dataStorage->getPricesForDates("2017-09-25", "2017-09-26");
+        // DEBUG!!! Remove the hardcoded current date!!!
         $prices = $this->dataStorage->getPrices("2017-09-25", "2017-09-26", $types, $towns);
         if(!$prices) {
             throw new Exception("VRest: Error with getting prices");
@@ -81,6 +82,7 @@ class PricesData implements DataInterface {
         
         //$prices = $this->dataStorage->getByDateInterval($dateFrom, $dateTo);
         //$prices = $this->dataStorage->getAveragedPricesForDates("2017-09-25", "2017-09-26");
+        // DEBUG!!! Remove the hardcoded current date!!!
         $prices = $this->dataStorage->getPrices("2017-09-25", "2017-09-26", [20]);
         if(!$prices) {
             throw new Exception("VRest: Error with getting prices");

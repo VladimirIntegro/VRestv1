@@ -80,7 +80,7 @@ class PdoStorage implements DataStorageInterface {
         // prepare query statement
         $queryStr = "SELECT price,town,date,type FROM price_stat";
         $executeParams = [];
-        if($dateFrom || $dateTo || $types || $towns) {
+        /*if($dateFrom || $dateTo || $types || $towns) {
             $queryStr .= " WHERE";
             if($dateFrom) {
                 $queryStr .= " date >= :datefr";
@@ -97,6 +97,29 @@ class PdoStorage implements DataStorageInterface {
             if($towns) {
                 $queryStr .= " AND town IN (:towns)";
                 $executeParams[":towns"] = implode(",", $towns);
+            }
+        }*/
+        if($dateFrom || $dateTo || $types || $towns) {
+            $queryStr .= " WHERE";
+            if($dateFrom) {
+                $queryStr .= " date>=?";
+                $executeParams[] = $dateFrom;
+            }
+            if($dateTo) {
+                $queryStr .= " AND date<=?";
+                $executeParams[] = $dateTo;
+            }
+            if($types) {
+                $inPlace  = str_repeat('?,', count($types) - 1) . '?';
+                $queryStr .= " AND type IN ($inPlace)";
+                //$executeParams[] = implode(",", $types);
+                $executeParams = array_merge($executeParams, $types);
+            }
+            if($towns) {
+                $inPlace  = str_repeat('?,', count($towns) - 1) . '?';
+                $queryStr .= " AND town IN ($inPlace)";
+                //$executeParams[] = implode(",", $towns);
+                $executeParams = array_merge($executeParams, $towns);
             }
         }
         $stmt = $this->conn->prepare($queryStr);
@@ -116,6 +139,11 @@ class PdoStorage implements DataStorageInterface {
             //}
             $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
+        /*$ret[] = $queryStr;
+        $ret[] = $executeParams;
+        $ret[] = $execRet;
+        $ret[] = $prices;
+        return print_r($ret, true);*/
         return (empty($prices)) ? false : $prices;
     }
     
