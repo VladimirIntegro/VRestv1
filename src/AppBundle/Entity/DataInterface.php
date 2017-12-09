@@ -15,8 +15,8 @@ interface DataInterface {
     /**
      * Get averaged prices and difference between current and previous date prices for each town.
      * 
-     * @param int $dateFrom Date in timestamp format
-     * @param int $dateTo Date in timestamp format
+     * @param string $dateFrom Date
+     * @param string $dateTo Date
      * @param array $types Prices types list
      * @param array $towns Towns list
      * @return array 
@@ -26,8 +26,8 @@ interface DataInterface {
     /**
      * Get averaged prices and difference between current and previous date prices for each town.
      * 
-     * @param int $dateFrom Date in timestamp format
-     * @param int $dateTo Date in timestamp format
+     * @param string $dateFrom Date
+     * @param string $dateTo Date
      * @return array
      */
     public function getAveragedPricesByDateInterval(string $dateFrom, string $dateTo);

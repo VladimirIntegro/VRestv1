@@ -102,11 +102,19 @@ class PdoStorage implements DataStorageInterface {
         if($dateFrom || $dateTo || $types || $towns) {
             $queryStr .= " WHERE";
             if($dateFrom) {
-                $queryStr .= " date>=?";
+                $queryStr .= " date >= ?";
+                // If the date is timestamp format convert it to the string in format Y-m-d to compare with
+                if(is_int($dateFrom)) {
+                    $dateFrom = date("Y-m-d", $dateFrom);
+                }
                 $executeParams[] = $dateFrom;
             }
             if($dateTo) {
-                $queryStr .= " AND date<=?";
+                $queryStr .= " AND date <= ?";
+                // If the date is timestamp format convert it to the string in format Y-m-d to compare with
+                if(is_int($dateTo)) {
+                    $dateTo = date("Y-m-d", $dateTo);
+                }
                 $executeParams[] = $dateTo;
             }
             if($types) {
@@ -139,35 +147,12 @@ class PdoStorage implements DataStorageInterface {
             //}
             $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-        /*$ret[] = $queryStr;
-        $ret[] = $executeParams;
-        $ret[] = $execRet;
-        $ret[] = $prices;
-        return print_r($ret, true);*/
+        //$ret[] = $queryStr;
+        //$ret[] = $executeParams;
+        //$ret[] = $execRet;
+        //$ret[] = $prices;
+        //return print_r($executeParams, true);
         return (empty($prices)) ? false : $prices;
     }
-    
-    /**
-     * Get averaged prices for towns by date
-     * 
-     * @param string $dateFrom Date in string format "Y-m-d"
-     * @param string $dateTo Date in string format "Y-m-d"
-     * @return array|null|FALSE Array of prices
-     */
-    /*public function getAveragedPricesForDates(string $dateFrom, string $dateTo) {
-        // prepare query statement
-        $stmt = $this->conn->prepare("SELECT price,town,date,type FROM price_stat WHERE date >= :datefr AND date <= :dateto AND type=20");
-        //print_r($stmt); exit;
-        //$date = "2017-09-26";
-        // execute the query
-        $prices = [];
-        if($stmt->execute([":datefr" => $dateFrom, ":dateto" => $dateTo])) {
-            //while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            //    $prices[] = $row;
-            //}
-            $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-        return (empty($prices)) ? false : $prices;
-    }*/
     
 }

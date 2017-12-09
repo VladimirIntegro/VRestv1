@@ -133,7 +133,9 @@ class RestApi implements RestApiInterface {
                 if(!$quer) {
                     return $this->buildJsonRequestContent("400", "Request query is empty!");
                 }
-                //return $this->buildJsonRequestContent("200", print_r($quer, true));
+                $quer = rawurldecode($quer);
+                //return $this->buildJsonRequestContent("200", json_encode([password_hash("YWEHH78734SJGU8307JDYOPHB", PASSWORD_DEFAULT), print_r($quer, true), md5("YWEHH78734SJGU8307JDYOPHB")], 
+                //                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
                 $querParams = array_filter(explode('&', $quer));
                 if(empty($querParams)) {
                     return $this->buildJsonRequestContent("400", "Bad request query!");
@@ -148,14 +150,18 @@ class RestApi implements RestApiInterface {
                 
                 //if(isset($reqBody["datefr"]) && isset($reqBody["dateto"])) {
                 if(isset($querParamsAssoc["datefr"]) && isset($querParamsAssoc["dateto"])) {
-                    $dateFrom = intval($querParamsAssoc["datefr"]);
-                    $dateTo = intval($querParamsAssoc["dateto"]);
+                    //$dateFrom = intval($querParamsAssoc["datefr"]);
+                    //$dateTo = intval($querParamsAssoc["dateto"]);
+                    //$datesAr = preg_replace('/[^0-9\-]/', "", [$querParamsAssoc["datefr"], $querParamsAssoc["dateto"]]);
+                    $dateFrom = preg_replace('/[^0-9\-]/', "", $querParamsAssoc["datefr"]);
+                    $dateTo   = preg_replace('/[^0-9\-]/', "", $querParamsAssoc["dateto"]);
                     // Get prices for types
                     if(isset($querParamsAssoc["types"])) {
                         //$ret[] = $querParamsAssoc["types"];
                         //$ret[] = rawurldecode($querParamsAssoc["types"]);
                         //$ret[] = explode(",", rawurldecode($querParamsAssoc["types"]));
-                        $types = explode(",", rawurldecode($querParamsAssoc["types"]));
+                        //$types = explode(",", rawurldecode($querParamsAssoc["types"]));
+                        $types = explode(",", $querParamsAssoc["types"]);
                         $cleanTypes = array_map(
                                 function ($t) {
                                     return intval($t);

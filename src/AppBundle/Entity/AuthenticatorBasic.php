@@ -63,7 +63,8 @@ class AuthenticatorBasic extends Authenticator implements AuthenticatorByUserPwI
      */
     public function checkUserPassword() {
         if( isset($_SERVER['PHP_AUTH_PW']) && 
-            $_SERVER['PHP_AUTH_PW'] == $this->getAuthParams()["userpassw"] ) {
+            //$_SERVER['PHP_AUTH_PW'] == $this->getAuthParams()["userpassw"] ) {
+            password_verify($_SERVER['PHP_AUTH_PW'], $this->getAuthParams()["userpassw"]) ) {
             return true;
             }
         else {

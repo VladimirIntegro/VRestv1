@@ -39,8 +39,8 @@ class PricesData implements DataInterface {
     /**
      * Get averaged prices and difference between current and previous date prices for each town.
      * 
-     * @param int $dateFrom Date in timestamp format
-     * @param int $dateTo Date in timestamp format
+     * @param string $dateFrom Date
+     * @param string $dateTo Date
      * @param array $types Prices types list
      * @param array $towns Towns list
      * @return array 
@@ -57,7 +57,8 @@ class PricesData implements DataInterface {
         //$prices = $this->dataStorage->getByDateInterval($dateFrom, $dateTo);
         //$prices = $this->dataStorage->getPricesForDates("2017-09-25", "2017-09-26");
         // DEBUG!!! Remove the hardcoded current date!!!
-        $prices = $this->dataStorage->getPrices("2017-09-25", "2017-09-26", $types, $towns);
+        //$prices[] = $dateFrom; $prices[] = $dateTo; return $prices;
+        $prices = $this->dataStorage->getPrices($dateFrom, $dateTo, $types, $towns);
         if(!$prices) {
             throw new Exception("VRest: Error with getting prices");
         }
@@ -67,8 +68,8 @@ class PricesData implements DataInterface {
     /**
      * Get averaged prices and difference between current and previous date prices for each town.
      * 
-     * @param int $dateFrom Date in timestamp format
-     * @param int $dateTo Date in timestamp format
+     * @param string $dateFrom Date
+     * @param string $dateTo Date
      * @return array
      */
     public function getAveragedPricesByDateInterval(string $dateFrom, string $dateTo) {
@@ -83,7 +84,8 @@ class PricesData implements DataInterface {
         //$prices = $this->dataStorage->getByDateInterval($dateFrom, $dateTo);
         //$prices = $this->dataStorage->getAveragedPricesForDates("2017-09-25", "2017-09-26");
         // DEBUG!!! Remove the hardcoded current date!!!
-        $prices = $this->dataStorage->getPrices("2017-09-25", "2017-09-26", [20]);
+        //$prices = $this->dataStorage->getPrices("2017-09-25", "2017-09-26", [20]);
+        $prices = $this->dataStorage->getPrices($dateFrom, $dateTo, [20]);
         if(!$prices) {
             throw new Exception("VRest: Error with getting prices");
         }
