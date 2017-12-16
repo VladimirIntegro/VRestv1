@@ -2,8 +2,6 @@
 // src/AppBundle/Entity/RestApiInterface.php
 namespace AppBundle\Entity;
 
-//use ConverterApp\Entity\Validator;
-
 /**
  * Copyright 2017 Vladimir Zhitkov. All rights reserved.
  * @author Vladimir Zhitkov

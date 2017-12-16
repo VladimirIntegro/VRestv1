@@ -2,8 +2,6 @@
 // src/AppBundle/Entity/DataInterface.php
 namespace AppBundle\Entity;
 
-//use ConverterApp\Entity\Validator;
-
 /**
  * Copyright 2017 Vladimir Zhitkov. All rights reserved.
  * @author Vladimir Zhitkov
@@ -13,7 +11,7 @@ namespace AppBundle\Entity;
 interface DataInterface {
     
     /**
-     * Get averaged prices and difference between current and previous date prices for each town.
+     * Get all prices for the interval by types and towns.
      * 
      * @param string $dateFrom Date
      * @param string $dateTo Date
@@ -31,5 +29,13 @@ interface DataInterface {
      * @return array
      */
     public function getAveragedPricesByDateInterval(string $dateFrom, string $dateTo);
+    
+    /**
+     * Set prices.
+     * 
+     * @param array $data Data array to save
+     * @return int
+     */
+    public function setPrices(array $data);
     
 }

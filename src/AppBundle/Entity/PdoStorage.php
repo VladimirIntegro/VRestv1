@@ -66,10 +66,6 @@ class PdoStorage implements DataStorageInterface {
      * @return string 
      */
     public function get() {
-        // prepare query statement
-        //$stmt = $this->conn->prepare($query);
-        // execute the query
-        //$stmt->execute();
         return "test get";
     }
     
@@ -80,25 +76,7 @@ class PdoStorage implements DataStorageInterface {
         // prepare query statement
         $queryStr = "SELECT price,town,date,type FROM price_stat";
         $executeParams = [];
-        /*if($dateFrom || $dateTo || $types || $towns) {
-            $queryStr .= " WHERE";
-            if($dateFrom) {
-                $queryStr .= " date >= :datefr";
-                $executeParams[":datefr"] = $dateFrom;
-            }
-            if($dateTo) {
-                $queryStr .= " AND date <= :dateto";
-                $executeParams[":dateto"] = $dateTo;
-            }
-            if($types) {
-                $queryStr .= " AND type IN (:types)";
-                $executeParams[":types"] = implode(",", $types);
-            }
-            if($towns) {
-                $queryStr .= " AND town IN (:towns)";
-                $executeParams[":towns"] = implode(",", $towns);
-            }
-        }*/
+        
         if($dateFrom || $dateTo || $types || $towns) {
             $queryStr .= " WHERE";
             if($dateFrom) {
@@ -120,18 +98,15 @@ class PdoStorage implements DataStorageInterface {
             if($types) {
                 $inPlace  = str_repeat('?,', count($types) - 1) . '?';
                 $queryStr .= " AND type IN ($inPlace)";
-                //$executeParams[] = implode(",", $types);
                 $executeParams = array_merge($executeParams, $types);
             }
             if($towns) {
                 $inPlace  = str_repeat('?,', count($towns) - 1) . '?';
                 $queryStr .= " AND town IN ($inPlace)";
-                //$executeParams[] = implode(",", $towns);
                 $executeParams = array_merge($executeParams, $towns);
             }
         }
         $stmt = $this->conn->prepare($queryStr);
-        //return $executeParams;
         // execute the query
         $prices = [];
         $execRet = false;
@@ -142,17 +117,41 @@ class PdoStorage implements DataStorageInterface {
             $execRet = $stmt->execute($executeParams);
         }
         if($execRet) {
-            //while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            //    $prices[] = $row;
-            //}
             $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-        //$ret[] = $queryStr;
-        //$ret[] = $executeParams;
-        //$ret[] = $execRet;
-        //$ret[] = $prices;
-        //return print_r($executeParams, true);
         return (empty($prices)) ? false : $prices;
+    }
+    
+    /**
+     * Save prices.
+     * 
+     * @param array $data Data array to save
+     * @return int
+     */
+    public function savePrices(array $data) {
+        $placeholders = "";
+        $valuesArrayToExecute = [];
+        $colNames = [];
+        $colNamesEmpty = true;
+        foreach($data as $dataEl) {
+            foreach($dataEl as $dataElEl) {
+                if($colNamesEmpty) {
+                    $colNames = array_keys($dataElEl, true);
+                    $colNamesEmpty = false;
+                }
+                $placeholders .= "(" . str_repeat('?,', count($dataElEl) - 1) . '?),';
+                foreach($dataElEl as $val) {
+                    $valuesArrayToExecute[] = $val;
+                }
+            }
+        }
+        if(empty($colNames)) {
+            return false;
+        }
+        $placeholders = trim($placeholders, ",");
+        $queryStr = "INSERT INTO price_stat (".implode(', ', $colNames).") VALUES ".$placeholders;
+        $stmt = $this->conn->prepare($queryStr);
+        return $stmt->execute($valuesArrayToExecute);
     }
     
 }

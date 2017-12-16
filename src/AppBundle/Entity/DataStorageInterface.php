@@ -2,8 +2,6 @@
 // src/AppBundle/Entity/DataStorageInterface.php
 namespace AppBundle\Entity;
 
-//use ConverterApp\Entity\Validator;
-
 /**
  * Copyright 2017 Vladimir Zhitkov. All rights reserved.
  * @author Vladimir Zhitkov
@@ -32,5 +30,13 @@ interface DataStorageInterface {
      * @return array|null|FALSE Array of prices
      */
     public function getPrices(string $dateFrom = null, string $dateTo = null, array $types = null, array $towns = null);
+    
+    /**
+     * Save prices.
+     * 
+     * @param array $data Data array to save
+     * @return int
+     */
+    public function savePrices(array $data);
     
 }

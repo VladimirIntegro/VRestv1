@@ -37,7 +37,7 @@ class PricesData implements DataInterface {
     }
 
     /**
-     * Get averaged prices and difference between current and previous date prices for each town.
+     * Get all prices for the interval by types and towns
      * 
      * @param string $dateFrom Date
      * @param string $dateTo Date
@@ -46,18 +46,6 @@ class PricesData implements DataInterface {
      * @return array 
      */
     public function getAllPrices(string $dateFrom = null, string $dateTo = null, array $types = null, array $towns = null) {
-        //$dates = $this->currentAndPreviousDate();
-        //$curDatePrices = $this->dataStorage->getAveragedPricesByDate($dates["current"]);
-        //$prevDatePrices = $this->dataStorage->getAveragedPricesByDate($dates["previous"]);
-        //$curDatePrices = $this->dataStorage->getAveragedPricesByDate("2017-09-26");
-        //$prevDatePrices = $this->dataStorage->getAveragedPricesByDate("2017-09-25");
-        //$dateFrom = date("Y-m-d", $dateFrom);
-        //$dateTo = date("Y-m-d", $dateTo);
-        
-        //$prices = $this->dataStorage->getByDateInterval($dateFrom, $dateTo);
-        //$prices = $this->dataStorage->getPricesForDates("2017-09-25", "2017-09-26");
-        // DEBUG!!! Remove the hardcoded current date!!!
-        //$prices[] = $dateFrom; $prices[] = $dateTo; return $prices;
         $prices = $this->dataStorage->getPrices($dateFrom, $dateTo, $types, $towns);
         if(!$prices) {
             throw new Exception("VRest: Error with getting prices");
@@ -73,23 +61,21 @@ class PricesData implements DataInterface {
      * @return array
      */
     public function getAveragedPricesByDateInterval(string $dateFrom, string $dateTo) {
-        //$dates = $this->currentAndPreviousDate();
-        //$curDatePrices = $this->dataStorage->getAveragedPricesByDate($dates["current"]);
-        //$prevDatePrices = $this->dataStorage->getAveragedPricesByDate($dates["previous"]);
-        //$curDatePrices = $this->dataStorage->getAveragedPricesByDate("2017-09-26");
-        //$prevDatePrices = $this->dataStorage->getAveragedPricesByDate("2017-09-25");
-        //$dateFrom = date("Y-m-d", $dateFrom);
-        //$dateTo = date("Y-m-d", $dateTo);
-        
-        //$prices = $this->dataStorage->getByDateInterval($dateFrom, $dateTo);
-        //$prices = $this->dataStorage->getAveragedPricesForDates("2017-09-25", "2017-09-26");
-        // DEBUG!!! Remove the hardcoded current date!!!
-        //$prices = $this->dataStorage->getPrices("2017-09-25", "2017-09-26", [20]);
         $prices = $this->dataStorage->getPrices($dateFrom, $dateTo, [20]);
         if(!$prices) {
             throw new Exception("VRest: Error with getting prices");
         }
         return $prices;
+    }
+    
+    /**
+     * Set prices.
+     * 
+     * @param array $data Data array to save
+     * @return int
+     */
+    public function setPrices(array $data) {
+        return $this->dataStorage->savePrices($data);
     }
     
 }
