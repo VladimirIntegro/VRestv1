@@ -1,5 +1,5 @@
 # VRestv1
-Light, clean REST API on PHP. It can be used to separate CPU and memory load and data storage space.
+Light REST API on PHP. Can be used as an example and starting point for a concrete project.
 
 Author Vladimir Zhitkov
 MIT license. All rights reserved.
