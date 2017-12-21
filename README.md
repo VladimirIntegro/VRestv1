@@ -2,6 +2,7 @@
 Light REST API on PHP. Can be used as an example and starting point for a concrete project.
 To start using the API create your data storage, add your config file in /src/AppBundle/Config/CoreConfig.php.
 The example source of the config file (don't forget to insert your actual credentials):
+
 namespace AppBundle\Config;
 
 /**
