@@ -37,31 +37,13 @@ class PricesData implements DataInterface {
     }
 
     /**
-     * Get all prices for the interval by types and towns
+     * Get data according to parameters.
      * 
-     * @param string $dateFrom Date
-     * @param string $dateTo Date
-     * @param array $types Prices types list
-     * @param array $towns Towns list
+     * @param array $params Data parameters list. Can be empty.
      * @return array 
      */
-    public function getAllPrices(string $dateFrom = null, string $dateTo = null, array $types = null, array $towns = null) {
-        $prices = $this->dataStorage->getPrices($dateFrom, $dateTo, $types, $towns);
-        if(!$prices) {
-            throw new Exception("VRest: Error with getting prices");
-        }
-        return $prices;
-    }
-
-    /**
-     * Get averaged prices and difference between current and previous date prices for each town.
-     * 
-     * @param string $dateFrom Date
-     * @param string $dateTo Date
-     * @return array
-     */
-    public function getAveragedPricesByDateInterval(string $dateFrom, string $dateTo) {
-        $prices = $this->dataStorage->getPrices($dateFrom, $dateTo, [20]);
+    public function getData(array $params = null) {
+        $prices = $this->dataStorage->getData(["price", "town" , "date", "type"], "price_stat", $params);
         if(!$prices) {
             throw new Exception("VRest: Error with getting prices");
         }
@@ -69,13 +51,13 @@ class PricesData implements DataInterface {
     }
     
     /**
-     * Set prices.
+     * Set data.
      * 
-     * @param array $data Data array to save
+     * @param array $data Data array to write
      * @return int
      */
-    public function setPrices(array $data) {
-        return $this->dataStorage->savePrices($data);
+    public function setData(array $data) {
+        return $this->dataStorage->setData($data, "price_stat");
     }
     
 }

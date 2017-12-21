@@ -96,6 +96,10 @@ class RestApi implements RestApiInterface {
                 if(isset($querParamsAssoc["datefr"]) && isset($querParamsAssoc["dateto"])) {
                     $dateFrom = preg_replace('/[^0-9\-]/', "", $querParamsAssoc["datefr"]);
                     $dateTo   = preg_replace('/[^0-9\-]/', "", $querParamsAssoc["dateto"]);
+                    $dataParams = [
+                        ["name" => "date", "clause" => ">=", "value" => $dateFrom],
+                        ["name" => "date", "clause" => "<=", "value" => $dateTo],
+                    ];
                     // Get prices for types
                     if(isset($querParamsAssoc["types"])) {
                         $types = explode(",", $querParamsAssoc["types"]);
@@ -105,10 +109,13 @@ class RestApi implements RestApiInterface {
                                 },
                                 $types
                             );
+                        
+                        $dataParams[] = ["name" => "type", "clause" => "IN", "value" => $cleanTypes];
+                        
                         return $this->buildJsonRequestContent(
                             "200", 
                             json_encode(
-                                    $this->data->getAllPrices($dateFrom, $dateTo, $cleanTypes), 
+                                    $this->data->getData($dataParams), 
                                     JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK
                                 )
                         );
@@ -118,7 +125,7 @@ class RestApi implements RestApiInterface {
                         return $this->buildJsonRequestContent(
                                 "200", 
                                 json_encode(
-                                        $this->data->getAveragedPricesByDateInterval($dateFrom, $dateTo), 
+                                        $this->data->getData($dataParams), 
                                         JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK
                                     )
                             );
@@ -151,7 +158,7 @@ class RestApi implements RestApiInterface {
                 return $this->buildJsonRequestContent(
                             "201", 
                             json_encode(
-                                    $this->data->setPrices($reqBody), 
+                                    $this->data->setData($reqBody), 
                                     JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK
                                 )
                         );

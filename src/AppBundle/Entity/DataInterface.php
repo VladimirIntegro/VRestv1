@@ -11,31 +11,19 @@ namespace AppBundle\Entity;
 interface DataInterface {
     
     /**
-     * Get all prices for the interval by types and towns.
+     * Get data according to parameters.
      * 
-     * @param string $dateFrom Date
-     * @param string $dateTo Date
-     * @param array $types Prices types list
-     * @param array $towns Towns list
+     * @param array $params Data parameters list. Can be empty.
      * @return array 
      */
-    public function getAllPrices(string $dateFrom = null, string $dateTo = null, array $types = null, array $towns = null);
-
-    /**
-     * Get averaged prices and difference between current and previous date prices for each town.
-     * 
-     * @param string $dateFrom Date
-     * @param string $dateTo Date
-     * @return array
-     */
-    public function getAveragedPricesByDateInterval(string $dateFrom, string $dateTo);
+    public function getData(array $params = null);
     
     /**
-     * Set prices.
+     * Set data.
      * 
-     * @param array $data Data array to save
+     * @param array $data Data array to write
      * @return int
      */
-    public function setPrices(array $data);
+    public function setData(array $data);
     
 }

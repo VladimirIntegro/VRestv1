@@ -17,26 +17,21 @@ interface DataStorageInterface {
     
     /**
      * Get data
-     */
-    public function get();
-    
-    /**
-     * Get all prices for date interval by object types
      * 
-     * @param string $dateFrom Date
-     * @param string $dateTo Date
-     * @param array $types Prices types list
-     * @param array $towns Towns list
+     * @param array $fieldsToGet Fields list to return
+     * @param array $dataSource Source of the data (DB table name, file name...)
+     * @param array $params Filter for the data in format ["name", "clause", "value"]
      * @return array|null|FALSE Array of prices
      */
-    public function getPrices(string $dateFrom = null, string $dateTo = null, array $types = null, array $towns = null);
+    public function getData(array $fieldsToGet = null, string $dataSource = null, array $params = null);
     
     /**
-     * Save prices.
+     * Set data.
      * 
-     * @param array $data Data array to save
+     * @param array $data Data array to write
+     * @param array $dataSource Source of the data (DB table name, file name...)
      * @return int
      */
-    public function savePrices(array $data);
+    public function setData(array $data, string $dataSource = null);
     
 }

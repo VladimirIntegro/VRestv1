@@ -29,7 +29,6 @@ class PdoStorage implements DataStorageInterface {
      */
     public function __construct(array $dbConfig)
     {
-        //$conn = new PDO('mysql:host=localhost;dbname=someDb', $username, $password);
         $this->dbConfig = $dbConfig;
     }
     
@@ -56,59 +55,41 @@ class PdoStorage implements DataStorageInterface {
         }
         catch(\PDOException $e) {
             throw new Exception($e->getMessage());
-            //echo $e->getMessage();
         }
-    }
-    
-    /**
-     * Get data
-     * 
-     * @return string 
-     */
-    public function get() {
-        return "test get";
     }
     
     /**
      * {@inheritdoc}
      */
-    public function getPrices(string $dateFrom = null, string $dateTo = null, array $types = null, array $towns = null) {
+    public function getData(array $fieldsToGet = null, string $dataSource = null, array $params = null) {
         // prepare query statement
-        $queryStr = "SELECT price,town,date,type FROM price_stat";
+        $fieldsStr = implode(",", $fieldsToGet);
+        $queryStr = "SELECT $fieldsStr FROM $dataSource";
         $executeParams = [];
         
-        if($dateFrom || $dateTo || $types || $towns) {
+        if($params) {
             $queryStr .= " WHERE";
-            if($dateFrom) {
-                $queryStr .= " date >= ?";
-                // If the date is timestamp format convert it to the string in format Y-m-d to compare with
-                if(is_int($dateFrom)) {
-                    $dateFrom = date("Y-m-d", $dateFrom);
+            $whereStr = "";
+            foreach($params as $param) {
+                if($whereStr != "") {
+                    $whereStr .= " AND";
                 }
-                $executeParams[] = $dateFrom;
-            }
-            if($dateTo) {
-                $queryStr .= " AND date <= ?";
-                // If the date is timestamp format convert it to the string in format Y-m-d to compare with
-                if(is_int($dateTo)) {
-                    $dateTo = date("Y-m-d", $dateTo);
+                if($param["clause"] == "IN") {
+                    $inPlace  = str_repeat('?,', count($param["value"]) - 1) . '?';
+                    $whereStr .= " {$param['name']} IN ($inPlace)";
+                    $executeParams = array_merge($executeParams, $param["value"]);
                 }
-                $executeParams[] = $dateTo;
+                else {
+                    $whereStr .= " {$param['name']} {$param['clause']} ?";
+                    $executeParams[] = $param["value"];
+                }
             }
-            if($types) {
-                $inPlace  = str_repeat('?,', count($types) - 1) . '?';
-                $queryStr .= " AND type IN ($inPlace)";
-                $executeParams = array_merge($executeParams, $types);
-            }
-            if($towns) {
-                $inPlace  = str_repeat('?,', count($towns) - 1) . '?';
-                $queryStr .= " AND town IN ($inPlace)";
-                $executeParams = array_merge($executeParams, $towns);
-            }
+            $queryStr .= $whereStr;
         }
+        
         $stmt = $this->conn->prepare($queryStr);
         // execute the query
-        $prices = [];
+        $retData = [];
         $execRet = false;
         if(empty($executeParams)) {
             $execRet = $stmt->execute();
@@ -117,18 +98,20 @@ class PdoStorage implements DataStorageInterface {
             $execRet = $stmt->execute($executeParams);
         }
         if($execRet) {
-            $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $retData = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-        return (empty($prices)) ? false : $prices;
+        //return print_r($stmt->errorInfo(), true); // Check errors
+        return (empty($retData)) ? false : $retData;
     }
     
     /**
-     * Save prices.
+     * Set data.
      * 
-     * @param array $data Data array to save
+     * @param array $data Data array to write
+     * @param array $dataSource Source of the data (DB table name, file name...)
      * @return int
      */
-    public function savePrices(array $data) {
+    public function setData(array $data, string $dataSource = null) {
         $placeholders = "";
         $valuesArrayToExecute = [];
         $colNames = [];
@@ -149,7 +132,7 @@ class PdoStorage implements DataStorageInterface {
             return false;
         }
         $placeholders = trim($placeholders, ",");
-        $queryStr = "INSERT INTO price_stat (".implode(', ', $colNames).") VALUES ".$placeholders;
+        $queryStr = "INSERT INTO $dataSource (".implode(', ', $colNames).") VALUES ".$placeholders;
         $stmt = $this->conn->prepare($queryStr);
         return $stmt->execute($valuesArrayToExecute);
     }
